@@ -24,7 +24,7 @@ def cfg():
     # Base configuration
     model_config = {"mode": 'train_and_eval', # 'predict'
                     "log_dir": "logs", # Base folder for logs files
-                    "batch_size": 64, # Batch size
+                    #"batch_size": 64, # Batch size
                     "init_sup_sep_lr": 1e-5, # Supervised separator learning rate
                     "epoch_it": 2000, # Number of supervised separator steps per epoch
                     "training_steps": 2000*100, # Number of training steps per training
@@ -45,7 +45,7 @@ def cfg():
                     'expected_sr': 22050,  # Downsample all audio input to this sampling rate
                     'mono_downmix': True,  # Whether to downsample the audio input
                     'output_type': 'direct', # Type of output layer, either "direct" or "difference". Direct output: Each source is result of tanh activation and independent. DIfference: Last source output is equal to mixture input - sum(all other sources)
-                    'context': False, # Type of padding for convolutions in separator. If False, feature maps double or half in dimensions after each convolution, and convolutions are padded with zeros ("same" padding). If True, convolution is only performed on the available mixture input, thus the output is smaller than the input
+                    #'context': False, # Type of padding for convolutions in separator. If False, feature maps double or half in dimensions after each convolution, and convolutions are padded with zeros ("same" padding). If True, convolution is only performed on the available mixture input, thus the output is smaller than the input
                     'network': 'unet', # Type of network architecture, either unet (our model) or unet_spectrogram (Jansson et al 2017 model)
                     'upsampling': 'linear', # Type of technique used for upsampling the feature maps in a unet architecture, either 'linear' interpolation or 'learned' filling in of extra samples
                     'task': 'voice', # Type of separation task. 'voice' : Separate music into voice and accompaniment. 'multi_instrument': Separate music into guitar, bass, vocals, drums and other (Sisec)
@@ -93,7 +93,7 @@ def urmp():
         "estimates_path": "estimates",
         "model_base_dir": "gs://vimsscheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
-        "context": True,
+        #"context": True,
         "upsampling": "linear",
         "mono_downmix": True,
         "task": "multi_instrument"
