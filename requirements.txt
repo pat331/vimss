@@ -2,8 +2,10 @@ sacred==0.7.3
 librosa==0.6.1
 scikit-image==0.13.1
 soundfile==0.10.2
-scikits.audiolab==0.11.0
+scikits.audiolab
 lxml==4.2.1
 musdb==0.2.3
 museval==0.2.0
 ipdb
+
+#sudo apt-get install libsndfile1-dev 
