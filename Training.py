@@ -306,7 +306,7 @@ def experiment(model_config):
         train_batch_size=model_config['batch_size'],
         eval_batch_size=model_config['batch_size'],
         predict_batch_size=model_config['batch_size'],
-        params={i: model_config[i] for i in model_config if i != 'batch_size'}
+        params={i: model_config[i] for i in model_config if i != ('batch_size' or 'context')}
     )
 
     if model_config['load_model']:
