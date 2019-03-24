@@ -276,10 +276,9 @@ def experiment(model_config):
 
     tf.logging.info("TPU resolver started")
 
-    tpu_cluster_resolver = TPUClusterResolver(
-        tpu=os.environ['TPU_NAME'],
-        project=os.environ['PROJECT_NAME'],
-        zone=os.environ['PROJECT_ZONE'])
+    TPU_WORKER = 'grpc://' + os.environ['COLAB_TPU_ADDR']
+
+    tpu_cluster_resolver = TPUClusterResolver(TPU_WORKER)
     config = tpu_config.RunConfig(
         cluster=tpu_cluster_resolver,
         model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
