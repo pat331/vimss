@@ -91,7 +91,7 @@ def urmp():
         "dataset_name": "urmp",
         "data_path": "ris",
         "estimates_path": "estimates",
-        "model_base_dir": "vimsscheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
@@ -104,9 +104,9 @@ def musdb():
     print("Training multi-instrument separation with MusDB dataset")
     model_config = {
         "dataset_name": "musdb",
-        "data_path": "gs://vimsstfrecords/",
+        "data_path": "gs://modelcheckpoints/",
         "estimates_path": "estimates",
-        "model_base_dir": "gs://vimsscheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
@@ -276,9 +276,10 @@ def experiment(model_config):
 
     tf.logging.info("TPU resolver started")
 
-    TPU_WORKER = 'grpc://' + os.environ['COLAB_TPU_ADDR']
-
-    tpu_cluster_resolver = TPUClusterResolver(TPU_WORKER)
+    tpu_cluster_resolver = TPUClusterResolver(
+        tpu=os.environ['TPU_NAME'],
+        project=os.environ['PROJECT_NAME'],
+        zone=os.environ['PROJECT_ZONE'])
     config = tpu_config.RunConfig(
         cluster=tpu_cluster_resolver,
         model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
