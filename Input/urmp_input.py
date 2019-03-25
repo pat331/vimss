@@ -87,14 +87,14 @@ class URMPInput(object):
                 tf.TensorShape([batch_size])))
             features['sample_id'].set_shape(features['sample_id'].get_shape().merge_with(
                 tf.TensorShape([batch_size])))
-    
+
         return features, sources
 
     def dataset_parser(self, value):
         """Parse an audio example record from a serialized string Tensor."""
         keys_to_features = {
             'audio/file_basename':
-                tf.FixedLenFeature([], tf.int64, -1),
+                tf.FixedLenFeature([], tf.string, -1),
             'audio/encoded':
                 tf.VarLenFeature(tf.float32),
             'audio/sample_rate':
