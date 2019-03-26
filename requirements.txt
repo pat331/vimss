@@ -8,7 +8,7 @@ musdb==0.2.3
 museval==0.2.0
 ipdb
 torch==0.4
-imaug==0.2.6
+imgaug==0.2.6
 spacy==2.0.16
 featuretools==0.4.0
 
