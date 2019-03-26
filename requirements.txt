@@ -7,9 +7,10 @@ lxml==4.2.1
 musdb==0.2.3
 museval==0.2.0
 ipdb
-torch==0.4
+torch==0.3.1
 imgaug==0.2.6
-spacy==2.0.16
+spacy==2.0.12
 featuretools==0.4.0
+magenta==0.3.12
 
 #sudo apt-get install libsndfile1-dev
