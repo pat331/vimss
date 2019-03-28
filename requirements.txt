@@ -11,6 +11,6 @@ torch==0.3.1
 imgaug==0.2.6
 spacy==2.0.12
 featuretools==0.4.0
-magenta==0.3.12
+magenta==0.3.10
 
 #sudo apt-get install libsndfile1-dev
