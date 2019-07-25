@@ -10,17 +10,17 @@ import tensorflow as tf
 # import soundfile as sf
 
 import librosa
-from google.cloud import storage
+# from google.cloud import storage
 
 
-flags.DEFINE_string(
-    'project', os.environ["PROJECT_NAME"], 'Google cloud project id for uploading the dataset.')
+# flags.DEFINE_string(
+#     'project', os.environ["PROJECT_NAME"], 'Google cloud project id for uploading the dataset.')
 flags.DEFINE_string(
     'gcs_output_path', 'gs://vimsstfrecords/urmpv2-labels', 'GCS path for uploading the dataset.')
 flags.DEFINE_string(
-    'local_scratch_dir', '/dev/tfrecords/urmpv2', 'Scratch directory path for temporary files.')
+    'local_scratch_dir', '/home/elias/projects/neural_network/tfrecords', 'Scratch directory path for temporary files.')
 flags.DEFINE_string(
-    'raw_data_dir', '/home/olga/urmpv2', 'Directory path for raw URMP dataset. '
+    'raw_data_dir', '/home/elias/projects/neural_network/Dataset', 'Directory path for raw URMP dataset. '
     'Should have train and test subdirectories inside it.')
 
 
@@ -360,8 +360,8 @@ def upload_to_gcs(training_records, test_records):
 def main(argv):  # pylint: disable=unused-argument
     tf.logging.set_verbosity(tf.logging.INFO)
 
-    if FLAGS.project is None:
-        raise ValueError('GCS Project must be provided.')
+    # if FLAGS.project is None:
+    #     raise ValueError('GCS Project must be provided.')
 
     if FLAGS.gcs_output_path is None:
         raise ValueError('GCS output path must be provided.')
@@ -376,6 +376,10 @@ def main(argv):  # pylint: disable=unused-argument
 
     # Convert the raw data into tf-records
     training_records, test_records = convert_to_tf_records(raw_data_dir)
+
+    print(training_records)
+    print('----------------------------------------')
+    print(test_records)
 
     # Upload to GCS
     # upload_to_gcs(training_records, test_records)
