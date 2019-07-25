@@ -87,7 +87,7 @@ class URMPInput(object):
                 tf.TensorShape([batch_size])))
             features['sample_id'].set_shape(features['sample_id'].get_shape().merge_with(
                 tf.TensorShape([batch_size])))
-    
+
         return features, sources
 
     def dataset_parser(self, value):

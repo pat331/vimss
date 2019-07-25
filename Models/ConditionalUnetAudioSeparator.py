@@ -3,7 +3,7 @@ import tensorflow as tf
 import Utils
 from Utils import LeakyReLU
 import numpy as np
-import OutputLayer
+from Models import OutputLayer
 
 class UnetAudioSeparator:
     '''
@@ -14,7 +14,7 @@ class UnetAudioSeparator:
     def __init__(self, num_layers, num_initial_filters, upsampling, output_type, context, num_sources, mono, filter_size, merge_filter_size):
         '''
         Initialize U-net
-        :param num_layers: Number of down- and upscaling layers in the network 
+        :param num_layers: Number of down- and upscaling layers in the network
         '''
         self.num_layers = num_layers
         self.num_initial_filters = num_initial_filters
@@ -30,7 +30,7 @@ class UnetAudioSeparator:
     def get_padding(self, shape):
         '''
         Calculates the required amounts of padding along each axis of the input and output, so that the Unet works and has the given shape as output shape
-        :param shape: Desired output shape 
+        :param shape: Desired output shape
         :return: Input_shape, output_shape, where each is a list [batch_size, time_steps, channels]
         '''
 
@@ -85,6 +85,7 @@ class UnetAudioSeparator:
                 current_layer = tf.layers.conv1d(current_layer, self.num_initial_filters + (self.num_initial_filters * i), self.filter_size, strides=1, activation=LeakyReLU, padding=self.padding) # out = in - filter + 1
                 enc_outputs.append(current_layer)
                 current_layer = current_layer[:,::2,:] # Decimate by factor of 2 # out = (in-1)/2 + 1
+
 
             current_layer = tf.layers.conv1d(current_layer, self.num_initial_filters + (self.num_initial_filters * self.num_layers),self.filter_size,activation=LeakyReLU,padding=self.padding) # One more conv here since we need to compute features after last decimation
             # Feature map here shall be X along one dimension

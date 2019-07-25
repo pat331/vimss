@@ -89,9 +89,9 @@ def urmp():
     print("Training multi-instrument separation with URMP dataset")
     model_config = {
         "dataset_name": "urmp",
-        "data_path": "gs://vimsstfrecords/urmp-labels",
+        "data_path": "gs://modelcheckpoints/urmpv2",
         "estimates_path": "estimates",
-        "model_base_dir": "gs://vimsscheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
@@ -104,9 +104,9 @@ def musdb():
     print("Training multi-instrument separation with MusDB dataset")
     model_config = {
         "dataset_name": "musdb",
-        "data_path": "gs://vimsstfrecords/",
+        "data_path": "gs://modelcheckpoints/",
         "estimates_path": "estimates",
-        "model_base_dir": "gs://vimsscheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
@@ -306,7 +306,7 @@ def experiment(model_config):
         train_batch_size=model_config['batch_size'],
         eval_batch_size=model_config['batch_size'],
         predict_batch_size=model_config['batch_size'],
-        params={i: model_config[i] for i in model_config if i != 'batch_size'}
+        params={i: model_config[i] for i in model_config if (i != 'batch_size' and i != 'context')}
     )
 
     if model_config['load_model']:
