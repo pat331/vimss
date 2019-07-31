@@ -29,7 +29,7 @@ def cfg():
                     "epoch_it": 2000, # Number of supervised separator steps per epoch
                     "training_steps": 2000*100, # Number of training steps per training
                     "evaluation_steps": 1000,
-                    "use_tpu": True,
+                    "use_tpu": False,
                     "use_bfloat16": True,
                     "load_model": True,
                     "predict_only": False,
@@ -89,9 +89,11 @@ def urmp():
     print("Training multi-instrument separation with URMP dataset")
     model_config = {
         "dataset_name": "urmp",
-        "data_path": "gs://modelcheckpoints/urmpv2",
+        # "data_path": "gs://modelcheckpoints/urmpv2",
+        "data_path": "/home/elias/projects/neural_network/tfrecords/train",
         "estimates_path": "estimates",
-        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
+        # "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
@@ -276,19 +278,30 @@ def experiment(model_config):
 
     tf.logging.info("TPU resolver started")
 
+    os.environ['PROJECT_NAME']='nnproj'
+    os.environ['PROJECT_ZONE']='boh'
+    os.environ['TPU_NAME']='bah'
     tpu_cluster_resolver = TPUClusterResolver(
         tpu=os.environ['TPU_NAME'],
         project=os.environ['PROJECT_NAME'],
         zone=os.environ['PROJECT_ZONE'])
-    config = tpu_config.RunConfig(
-        cluster=tpu_cluster_resolver,
-        model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
-        save_checkpoints_steps=500,
-        save_summary_steps=250,
-        tpu_config=tpu_config.TPUConfig(
-            iterations_per_loop=500,
-            num_shards=8,
-            per_host_input_for_training=tpu_config.InputPipelineConfig.PER_HOST_V1))  # pylint: disable=line-too-long
+
+    if model_config["use_tpu"]:
+        config = tpu_config.RunConfig(
+            cluster=tpu_cluster_resolver,
+            model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
+            save_checkpoints_steps=500,
+            save_summary_steps=250,
+            tpu_config=tpu_config.TPUConfig(
+                iterations_per_loop=500,
+                num_shards=8,
+                per_host_input_for_training=tpu_config.InputPipelineConfig.PER_HOST_V1))  # pylint: disable=line-too-long
+    else:
+        config = tpu_config.RunConfig(
+            cluster=tpu_cluster_resolver,
+            model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
+            save_checkpoints_steps=500,
+            save_summary_steps=250)  # pylint: disable=line-too-long
 
     tf.logging.info("Creating datasets")
     urmp_train, urmp_eval, urmp_test = [urmp_input.URMPInput(
@@ -306,7 +319,7 @@ def experiment(model_config):
         train_batch_size=model_config['batch_size'],
         eval_batch_size=model_config['batch_size'],
         predict_batch_size=model_config['batch_size'],
-        params={i: model_config[i] for i in model_config if (i != 'batch_size' and i != 'context')}
+        params={i: model_config[i] for i in model_config if (i != 'batch_size' and i != 'context')} # TODO: context
     )
 
     if model_config['load_model']:
@@ -320,7 +333,7 @@ def experiment(model_config):
         separator.train(
             input_fn=urmp_train.input_fn,
             steps=model_config['training_steps'])
-
+        # ...zzz...
         tf.logging.info("Supervised training finished!")
         tf.logging.info("Evaluate model")
         # Evaluate the model.
