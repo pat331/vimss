@@ -11,7 +11,7 @@ import Models.ConditionalUnetAudioSeparator
 
 from tensorflow.contrib.cluster_resolver import TPUClusterResolver
 from tensorflow.contrib import summary
-from tensorflow.contrib.tpu.python.tpu import tpu_config
+from tf.contrib import tpu
 from tensorflow.contrib.tpu.python.tpu import tpu_estimator
 from tensorflow.contrib.tpu.python.tpu import tpu_optimizer
 from tensorflow.contrib.tpu.python.tpu import bfloat16
@@ -279,26 +279,34 @@ def experiment(model_config):
 
     tf.logging.info("TPU resolver started")
 
-    os.environ['PROJECT_NAME']='nnproj'
-    os.environ['PROJECT_ZONE']='boh'
-    os.environ['TPU_NAME']='bah'
-    tpu_cluster_resolver = TPUClusterResolver(
-        tpu=os.environ['TPU_NAME'],
-        project=os.environ['PROJECT_NAME'],
-        zone=os.environ['PROJECT_ZONE'])
+    if 'COLAB_TPU_ADDR' in os.environ:
+      TF_MASTER = 'grpc://{}'.format(os.environ['COLAB_TPU_ADDR'])
+    else:
+      TF_MASTER=''
+
+    # os.environ['PROJECT_NAME']='nnproj'
+    # os.environ['PROJECT_ZONE']='boh'
+    # os.environ['TPU_NAME']='bah'
+    #
+    # tpu_cluster_resolver = TPUClusterResolver(
+    #     tpu=os.environ['TPU_NAME'],
+    #     project=os.environ['PROJECT_NAME'],
+    #     zone=os.environ['PROJECT_ZONE'])
 
     if model_config["use_tpu"]:
-        config = tpu_config.RunConfig(
-            cluster=tpu_cluster_resolver,
+        config = tpu.RunConfig(
+            # cluster=tpu_cluster_resolver,
+            tf_random_seed=RANDOM_SEED,
+            master=TF_MASTER,
             model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
             save_checkpoints_steps=500,
             save_summary_steps=250,
-            tpu_config=tpu_config.TPUConfig(
+            tpu_config=tpu.TPUConfig(
                 iterations_per_loop=500,
                 num_shards=8,
-                per_host_input_for_training=tpu_config.InputPipelineConfig.PER_HOST_V1))  # pylint: disable=line-too-long
+                per_host_input_for_training=tpu.InputPipelineConfig.PER_HOST_V1))  # pylint: disable=line-too-long
     else:
-        config = tpu_config.RunConfig(
+        config = tpu.RunConfig(
             # cluster=tpu_cluster_resolver,
             # model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
             save_checkpoints_steps=500,
@@ -313,7 +321,7 @@ def experiment(model_config):
 
     tf.logging.info("Assigning TPUEstimator")
     # Optimize in a +supervised fashion until validation loss worsens
-    separator = tpu_estimator.TPUEstimator(
+    separator = tpu.TPUEstimator(
         use_tpu=model_config["use_tpu"],
         model_fn=unet_separator,
         config=config,
