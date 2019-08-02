@@ -18,6 +18,7 @@ from tensorflow.contrib.tpu.python.tpu import bfloat16
 from tensorflow.python.estimator import estimator
 
 ex = Experiment('Conditioned-Waveunet')
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 @ex.config
 def cfg():
@@ -45,7 +46,7 @@ def cfg():
                     'expected_sr': 22050,  # Downsample all audio input to this sampling rate
                     'mono_downmix': True,  # Whether to downsample the audio input
                     'output_type': 'direct', # Type of output layer, either "direct" or "difference". Direct output: Each source is result of tanh activation and independent. DIfference: Last source output is equal to mixture input - sum(all other sources)
-                    'context': False, # Type of padding for convolutions in separator. If False, feature maps double or half in dimensions after each convolution, and convolutions are padded with zeros ("same" padding). If True, convolution is only performed on the available mixture input, thus the output is smaller than the input
+                    'input_context': False, # Type of padding for convolutions in separator. If False, feature maps double or half in dimensions after each convolution, and convolutions are padded with zeros ("same" padding). If True, convolution is only performed on the available mixture input, thus the output is smaller than the input
                     'network': 'unet', # Type of network architecture, either unet (our model) or unet_spectrogram (Jansson et al 2017 model)
                     'upsampling': 'linear', # Type of technique used for upsampling the feature maps in a unet architecture, either 'linear' interpolation or 'learned' filling in of extra samples
                     'task': 'voice', # Type of separation task. 'voice' : Separate music into voice and accompaniment. 'multi_instrument': Separate music into guitar, bass, vocals, drums and other (Sisec)
@@ -68,7 +69,7 @@ def baseline_stereo():
     print("Training baseline model with difference output and input context (valid convolutions)")
     model_config = {
         "output_type" : "difference",
-        "context" : True,
+        "input_context" : True,
         "mono_downmix" : False
     }
 
@@ -78,7 +79,7 @@ def full_multi_instrument():
     print("Training multi-instrument separation with best model")
     model_config = {
         "output_type": "difference",
-        "context": True,
+        "input_context": True,
         "upsampling": "linear",
         "mono_downmix": True,
         "task": "multi_instrument"
@@ -95,7 +96,7 @@ def urmp():
         # "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "model_base_dir": "modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
-        "context": True,
+        "input_context": True,
         "upsampling": "linear",
         "mono_downmix": True,
         "task": "multi_instrument"
@@ -110,7 +111,7 @@ def musdb():
         "estimates_path": "estimates",
         "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
-        "context": True,
+        "input_context": True,
         "upsampling": "linear",
         "mono_downmix": True,
         "task": "multi_instrument"
@@ -122,7 +123,7 @@ def baseline_comparison():
         "batch_size": 4, # Less output since model is so big.
 
         "output_type": "difference",
-        "context": True,
+        "input_context": True,
         "num_frames" : 768*127 + 1024,
         "duration" : 13,
         "expected_sr" : 8192,
@@ -175,12 +176,12 @@ def unet_separator(features, labels, mode, params):
     sources = labels
     model_config = params
     disc_input_shape = [model_config["batch_size"], model_config["num_frames"], 0]
-
+    print("##########################################", model_config.keys())
     with bfloat16.bfloat16_scope():
         separator_class = Models.ConditionalUnetAudioSeparator.UnetAudioSeparator(
             model_config["num_layers"], model_config["num_initial_filters"],
             output_type=model_config["output_type"],
-            context=model_config["context"],
+            context=model_config["input_context"],
             mono=model_config["mono_downmix"],
             upsampling=model_config["upsampling"],
             num_sources=model_config["num_sources"],
@@ -298,8 +299,8 @@ def experiment(model_config):
                 per_host_input_for_training=tpu_config.InputPipelineConfig.PER_HOST_V1))  # pylint: disable=line-too-long
     else:
         config = tpu_config.RunConfig(
-            cluster=tpu_cluster_resolver,
-            model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
+            # cluster=tpu_cluster_resolver,
+            # model_dir=model_config['model_base_dir'] + os.path.sep + str(model_config["experiment_id"]),
             save_checkpoints_steps=500,
             save_summary_steps=250)  # pylint: disable=line-too-long
 
@@ -319,7 +320,7 @@ def experiment(model_config):
         train_batch_size=model_config['batch_size'],
         eval_batch_size=model_config['batch_size'],
         predict_batch_size=model_config['batch_size'],
-        params={i: model_config[i] for i in model_config if (i != 'batch_size' and i != 'context')} # TODO: context
+        params={i: model_config[i] for i in model_config if (i != 'batch_size')}
     )
 
     if model_config['load_model']:
