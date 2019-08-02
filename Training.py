@@ -18,6 +18,7 @@ from tensorflow.contrib.tpu.python.tpu import bfloat16
 from tensorflow.python.estimator import estimator
 
 ex = Experiment('Conditioned-Waveunet')
+RANDOM_SEED = 42
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 @ex.config
