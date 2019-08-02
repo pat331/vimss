@@ -11,7 +11,7 @@ import Models.ConditionalUnetAudioSeparator
 
 from tensorflow.contrib.cluster_resolver import TPUClusterResolver
 from tensorflow.contrib import summary
-from tf.contrib import tpu
+from tensorflow.contrib import tpu
 from tensorflow.contrib.tpu.python.tpu import tpu_estimator
 from tensorflow.contrib.tpu.python.tpu import tpu_optimizer
 from tensorflow.contrib.tpu.python.tpu import bfloat16
