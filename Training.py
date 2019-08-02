@@ -90,10 +90,14 @@ def urmp():
     model_config = {
         "dataset_name": "urmp",
         "data_path": "gs://modelcheckpoints/urmpv2",
+<<<<<<< HEAD
         #"data_path": "/home/elias/projects/neural_network/tfrecords/train",
+=======
+        # "data_path": "/home/elias/projects/neural_network/tfrecords/train",
+>>>>>>> elias/master
         "estimates_path": "estimates",
-        # "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
-        "model_base_dir": "modelcheckpoints", # Base folder for model checkpoints
+        "model_base_dir": "gs://modelcheckpoints", # Base folder for model checkpoints
+        # "model_base_dir": "modelcheckpoints", # Base folder for model checkpoints
         "output_type": "difference",
         "context": True,
         "upsampling": "linear",
