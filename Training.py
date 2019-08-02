@@ -2,6 +2,7 @@ from sacred import Experiment
 import tensorflow as tf
 import numpy as np
 import os
+import json
 
 from Input import urmp_input
 import Utils
@@ -290,7 +291,7 @@ def experiment(model_config):
       TF_MASTER = 'grpc://{}'.format(os.environ['COLAB_TPU_ADDR'])
 
       # Upload credentials to TPU.
-      with tf.Session(TF_MASTER) as sess:    
+      with tf.Session(TF_MASTER) as sess:
         with open('/content/adc.json', 'r') as f:
           auth_info = json.load(f)
         tf.contrib.cloud.configure_gcs(sess, credentials=auth_info)
