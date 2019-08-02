@@ -16,6 +16,7 @@ from tensorflow.contrib.tpu.python.tpu import tpu_estimator
 from tensorflow.contrib.tpu.python.tpu import tpu_optimizer
 from tensorflow.contrib.tpu.python.tpu import bfloat16
 from tensorflow.python.estimator import estimator
+from google.colab import auth
 
 ex = Experiment('Conditioned-Waveunet')
 RANDOM_SEED = 42
@@ -278,10 +279,22 @@ def experiment(model_config):
     tf.logging.set_verbosity(tf.logging.INFO)
     tf.logging.info("SCRIPT START")
 
+    if model_config["use_tpu"]:
+        assert 'COLAB_TPU_ADDR' in os.environ, 'Missing TPU; did you request a TPU in Notebook Settings?'
+
+    auth.authenticate_user()
+
     tf.logging.info("TPU resolver started")
 
     if 'COLAB_TPU_ADDR' in os.environ:
       TF_MASTER = 'grpc://{}'.format(os.environ['COLAB_TPU_ADDR'])
+
+      # Upload credentials to TPU.
+      with tf.Session(TF_MASTER) as sess:    
+        with open('/content/adc.json', 'r') as f:
+          auth_info = json.load(f)
+        tf.contrib.cloud.configure_gcs(sess, credentials=auth_info)
+      # Now credentials are set for all future sessions on this TPU.
     else:
       TF_MASTER=''
 
