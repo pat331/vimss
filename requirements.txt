@@ -4,7 +4,7 @@ scikit-image
 soundfile
 scikits.audiolab
 lxml
-musdb
+musdb==0.2.3
 museval
 google-cloud-storage
 ipdb
